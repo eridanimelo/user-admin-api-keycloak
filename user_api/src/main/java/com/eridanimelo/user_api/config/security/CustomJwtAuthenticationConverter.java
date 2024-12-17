@@ -14,36 +14,34 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, JwtAuthe
 
     @Override
     public JwtAuthenticationToken convert(@NonNull Jwt jwt) {
-        // Converte as authorities padrão do JWT
+        // Converts the default JWT authorities
         JwtGrantedAuthoritiesConverter defaultGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         Collection<GrantedAuthority> authorities = defaultGrantedAuthoritiesConverter.convert(jwt);
 
-        // Adiciona lógica personalizada para mapear authorities adicionais, se
-        // necessário
+        // Adds custom logic to map additional authorities, if necessary
         Collection<GrantedAuthority> customAuthorities = mapCustomAuthorities(jwt);
         if (customAuthorities != null) {
             authorities.addAll(customAuthorities);
         }
 
-        // Definir o principalName como um atributo customizado, como
-        // "preferred_username"
+        // Set the principalName as a custom attribute, such as "preferred_username"
         String principalName = jwt.getClaim("preferred_username");
         if (principalName == null) {
-            principalName = jwt.getSubject(); // Fallback para o ID padrão (sub)
+            principalName = jwt.getSubject(); // Fallback to the default ID (sub)
         }
 
         return new JwtAuthenticationToken(jwt, authorities, principalName);
     }
 
     private Collection<GrantedAuthority> mapCustomAuthorities(Jwt jwt) {
-        // Implemente lógica para mapear authorities customizadas a partir do JWT
-        // Exemplo: extraindo roles de um claim chamado "roles"
+        // Implement logic to map custom authorities from the JWT
+        // Example: extracting roles from a claim called "roles"
         List<String> roles = jwt.getClaimAsStringList("roles");
         if (roles != null) {
             return roles.stream()
-                    .map(role -> (GrantedAuthority) () -> "ROLE_" + role.toUpperCase()) // Prefixo padrão de ROLE_
+                    .map(role -> (GrantedAuthority) () -> "ROLE_" + role.toUpperCase()) // Default ROLE_ prefix
                     .toList();
         }
-        return List.of(); // Sem roles customizadas
+        return List.of(); // No custom roles
     }
 }
