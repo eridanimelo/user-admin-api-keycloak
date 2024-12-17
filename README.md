@@ -1,5 +1,8 @@
 # Keycloak Configuration and User Creation Guide
 
+[Watch the video here](https://youtu.be/JtxQv18PeAw)
+
+
 Follow these steps to configure Keycloak and create a new user for your Spring Boot project.
 
 ## 1. Start Keycloak with Docker
