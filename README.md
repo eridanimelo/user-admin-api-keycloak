@@ -1,6 +1,7 @@
 # Keycloak Configuration and User Creation Guide
 
-[Watch the video here](https://youtu.be/JtxQv18PeAw)
+<a href="https://youtu.be/JtxQv18PeAw" target="_blank">Watch the video here</a>
+
 
 
 Follow these steps to configure Keycloak and create a new user for your Spring Boot project.
