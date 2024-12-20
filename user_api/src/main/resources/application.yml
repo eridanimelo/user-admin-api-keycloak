@@ -37,7 +37,7 @@ keycloak:
   realm: user-api 
   client:
     id: admin-cli # Client ID Keycloak
-    secret: HBgQrWjtpskTuSVCUK1VNc5sS0YbnS7C
+    secret: ZQEAl5LvOO7HbTx1qF4zAMkWuDBn0XLm
   admin-username: admin
   admin-password: admin
 

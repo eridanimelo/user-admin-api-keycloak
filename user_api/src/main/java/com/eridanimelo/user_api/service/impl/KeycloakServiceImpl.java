@@ -3,6 +3,7 @@ package com.eridanimelo.user_api.service.impl;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -66,11 +67,17 @@ public class KeycloakServiceImpl implements KeycloakService {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEnabled(true);
+        user.setEmailVerified(false);
+        user.setRequiredActions(Collections.singletonList("VERIFY_EMAIL"));
 
         Response response = keycloak.realm(realm).users().create(user);
         if (response.getStatus() == 201) {
             String userId = response.getLocation().getPath().replaceAll(".*/", "");
             setUserPassword(userId, password);
+
+            // Enviar e-mail de verificação manualmente, se necessário
+            UserResource userResource = keycloak.realm(realm).users().get(userId);
+            userResource.sendVerifyEmail();
             return userId;
         } else {
             throw new RuntimeException("Failed to create user: " + response.getStatus());

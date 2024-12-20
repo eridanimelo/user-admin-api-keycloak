@@ -36,6 +36,8 @@ Now, create a new client for the application:
 2. Click on Create.
 3. Name the client `userapi`, and set the Client Protocol to `openid-connect`.
 4. After creating the client, go to the Settings tab and configure it as needed.
+5. Valid redirect URIs: `http://localhost:4200/*`,
+6. Web origins: `*`,
 
 ## 5. Create a New User
 To create a new user:
@@ -63,7 +65,7 @@ To retrieve the Client Secret:
 Assign the necessary roles to the service account:
 
 1. Go to the Service Account Roles tab.
-2. Assign the roles `manage-users` and `view-users`.
+2. Assign the roles`manage-realm`, `manage-users` and `view-users`.
 
 With this, your Keycloak configuration is complete.
 
