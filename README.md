@@ -122,3 +122,6 @@ curl --request POST \
 Replace `mytoken` with the actual token you retrieved in step 10.
 
 That's it! You have now configured Keycloak, created a user, and successfully integrated it with your Spring Boot application.
+
+
+## 11. Frontend ANGULAR 19
