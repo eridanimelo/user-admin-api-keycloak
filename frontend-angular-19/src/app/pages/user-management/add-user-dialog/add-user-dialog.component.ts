@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { UserService } from '../../../services/user.service';
 import { ToastrService } from 'ngx-toastr';
+import { UserRequestDTO, UserRepresentation } from '../../../services/user.service';
 
 @Component({
   selector: 'app-add-user-dialog',
@@ -15,10 +16,10 @@ import { ToastrService } from 'ngx-toastr';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
   ],
   templateUrl: './add-user-dialog.component.html',
-  styleUrls: ['./add-user-dialog.component.css']
+  styleUrls: ['./add-user-dialog.component.css'],
 })
 export class AddUserDialogComponent {
   userForm: FormGroup;
@@ -35,30 +36,42 @@ export class AddUserDialogComponent {
       lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
-      confirmPassword: ['', Validators.required]
+      confirmPassword: ['', Validators.required],
     });
   }
 
-
   createUser(): void {
     if (this.userForm.valid) {
-      this.userService.createUser(this.userForm.value).subscribe({
+      const formValues = this.userForm.value;
+
+      // Criando o UserRepresentation
+      const userRepresentation: UserRepresentation = {
+        username: formValues.username,
+        firstName: formValues.firstName,
+        lastName: formValues.lastName,
+        email: formValues.email,
+      };
+
+      // Criando o UserRequestDTO
+      const userRequest: UserRequestDTO = {
+        user: userRepresentation,
+        password: formValues.password,
+      };
+
+      this.userService.createUser(userRequest).subscribe({
         next: () => {
-          this.toastr.success('User created successfully!', 'Toastr fun!');
-          this.dialogRef.close(this.userForm.value);
+          this.toastr.success('User created successfully!', 'Success');
+          this.dialogRef.close(userRequest);
         },
         error: (err) => {
           console.error(err);
-
-          this.toastr.error('Error creating user.', 'Toastr fun!');
+          this.toastr.error('Error creating user.', 'Error');
         },
       });
     }
   }
 
-  onCancel() {
+  onCancel(): void {
     this.dialogRef.close(false);
   }
-
-
 }

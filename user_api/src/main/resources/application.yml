@@ -20,6 +20,17 @@ spring:
         provider:
           keycloak:
             issuer-uri: http://localhost:8081/realms/user-api
+  mail:
+    host: localhost
+    port: 1025
+    username: ""
+    password: ""
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls: 
+            enable: false
 keycloak:
   server:
     url: http://localhost:8081
@@ -27,6 +38,13 @@ keycloak:
   client:
     id: admin-cli # Client ID Keycloak
     secret: HBgQrWjtpskTuSVCUK1VNc5sS0YbnS7C
-    
+  admin-username: admin
+  admin-password: admin
+
+logging:
+  level:
+    root: INFO
+    org.springframework: DEBUG
+    com.eridanimelo: DEBUG
 
 

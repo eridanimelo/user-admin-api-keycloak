@@ -2,13 +2,17 @@ package com.eridanimelo.user_api.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 
 public interface KeycloakService {
-    void createUser(String username, String firstName, String lastName, String email, String password);
+    String createUser(String username, String firstName, String lastName, String email, String password);
 
-    void addUserRole(String userId, String roleName);
+    void assignRoleToUser(String userId, String roleName);
 
-    String findUserIdByEmail(String email);
+    Optional<UserRepresentation> findUserByEmail(String email);
 
     void deleteUser(String email);
 
@@ -16,12 +20,12 @@ public interface KeycloakService {
 
     void enableUser(String email);
 
-    List<Map<String, Object>> listAllUsers();
+    List<UserRepresentation> listAllUsers();
 
     void resetUserPassword(String email, String newPassword);
 
     void removeUserRole(String userId, String roleName);
 
-    List<Map<String, Object>> listAllRoles();
+    List<RoleRepresentation> listAllRoles();
 
 }

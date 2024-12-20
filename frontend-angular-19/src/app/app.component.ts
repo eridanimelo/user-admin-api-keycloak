@@ -6,13 +6,14 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 import { CommonModule } from '@angular/common';
 import { KeycloakService } from 'keycloak-angular';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CommonModule, RouterModule, MatToolbarModule, MatButtonModule, MatIconModule, MatMenuModule, MatDividerModule],
+  imports: [RouterOutlet, CommonModule, RouterModule, MatToolbarModule, MatButtonModule, MatIconModule, MatMenuModule, MatDividerModule, MatSidenavModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { UserDTO, UserService } from '../../../services/user.service';
+import { UserRequestDTO, UserRepresentation, UserService } from '../../../services/user.service';
 import { passwordMatchValidator } from '../user-management.component';
 import { ToastrService } from 'ngx-toastr';
 
@@ -18,21 +18,22 @@ import { ToastrService } from 'ngx-toastr';
     MatButtonModule,
   ],
   templateUrl: './reset-password-dialog.component.html',
-  styleUrl: './reset-password-dialog.component.css'
+  styleUrls: ['./reset-password-dialog.component.css'],
 })
 export class ResetPasswordDialogComponent {
 
   form: FormGroup;
-  email!: string;
+  user!: UserRepresentation;
 
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
     private toastr: ToastrService,
     public dialogRef: MatDialogRef<ResetPasswordDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { email: string }
+    @Inject(MAT_DIALOG_DATA) public data: { user: UserRepresentation }
   ) {
-    this.email = data['email'];
+    this.user = data['user'];
+
     this.form = this.fb.nonNullable.group(
       {
         password: ['', Validators.required],
@@ -48,16 +49,20 @@ export class ResetPasswordDialogComponent {
 
   onSubmit(): void {
     if (this.form.valid) {
-      const user: UserDTO = {
-        email: this.email, password: this.form.get('password')?.value
+
+      const userRequest: UserRequestDTO = {
+        user: this.user,
+        password: this.form.get('password')?.value,
       };
-      this.userService.resetPassword(user).subscribe({
+
+      this.userService.resetPassword(userRequest).subscribe({
         next: () => {
           this.dialogRef.close(true);
+          this.toastr.success('Password reset successfully.', 'Success!');
         },
         error: (err) => {
           console.error(err);
-          this.toastr.error('Error resetting password.', 'Toastr fun!');
+          this.toastr.error('Error resetting password.', 'Error');
         },
       });
     }

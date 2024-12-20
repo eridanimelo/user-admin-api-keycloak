@@ -14,7 +14,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { KeycloakService } from 'keycloak-angular';
 import { ToastrService } from 'ngx-toastr';
 
-import { UserDTO, UserService } from '../../services/user.service';
+import { UserRepresentation, UserService } from '../../services/user.service';
 
 import { AddUserDialogComponent } from './add-user-dialog/add-user-dialog.component';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
@@ -97,20 +97,20 @@ export class UserManagementComponent implements OnInit {
 
 
 
-  resetPassword(email: string): void {
+  resetPassword(user: UserRepresentation): void {
     const dialogRef = this.dialog.open(ResetPasswordDialogComponent, {
       width: '300px',
-      data: { email },
+      data: { user },
     });
 
     dialogRef.afterClosed().subscribe((newPassword) => {
       if (newPassword) {
-        this.toastr.success('Password reset successfully!', 'Toastr fun!');
+
       }
     });
   }
 
-  deleteUser(email: string): void {
+  deleteUser(user: UserRepresentation): void {
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '300px',
@@ -119,7 +119,7 @@ export class UserManagementComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((confirmed) => {
       if (confirmed) {
-        this.userService.deleteUser(email).subscribe({
+        this.userService.deleteUser(user.id!).subscribe({
           next: () => {
 
             this.toastr.success('User deleted successfully!', 'Toastr fun!');
@@ -134,7 +134,7 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
-  onToggleChangeDisable(user: UserDTO): void {
+  onToggleChangeDisable(user: UserRepresentation): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '300px',
       data: { message: `Are you sure you want to ${!user.enabled ? 'disable' : 'enable'} this user?` },
@@ -143,7 +143,7 @@ export class UserManagementComponent implements OnInit {
     dialogRef.afterClosed().subscribe((confirmed) => {
       if (confirmed) {
         if (!user.enabled) {
-          this.userService.disableUser(user.email).subscribe({
+          this.userService.disableUser(user.id!).subscribe({
             next: () => {
               this.toastr.success(`User ${!user.enabled ? 'disable' : 'enable'}  successfully!`, 'Toastr fun!');
               // this.loadUsers();
@@ -154,7 +154,7 @@ export class UserManagementComponent implements OnInit {
             },
           });
         } else {
-          this.userService.enableUser(user.email).subscribe({
+          this.userService.enableUser(user.id!).subscribe({
             next: () => {
               this.toastr.success(`User ${!user.enabled ? 'disable' : 'enable'}  successfully!`, 'Toastr fun!');
               // this.loadUsers();
@@ -197,7 +197,7 @@ export class UserManagementComponent implements OnInit {
         this.userService.removeRole(user.id, roleName).subscribe({
           next: () => {
             this.toastr.success(`Role "${roleName}" removed successfully!`, 'Success');
-            this.loadUsers(); // Atualiza a lista de usuários
+            this.loadUsers();
           },
           error: (err) => {
             console.error(err);
@@ -207,7 +207,5 @@ export class UserManagementComponent implements OnInit {
       }
     });
   }
-
-
 
 }

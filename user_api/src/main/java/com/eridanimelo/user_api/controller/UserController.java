@@ -5,14 +5,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.ResponseEntity;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import com.eridanimelo.user_api.dto.UserDTO;
+import com.eridanimelo.user_api.dto.UserRequestDTO;
 import com.eridanimelo.user_api.service.KeycloakService;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,13 +31,16 @@ public class UserController {
                         @ApiResponse(responseCode = "400", description = "Invalid input data"),
                         @ApiResponse(responseCode = "500", description = "Internal server error")
         })
-        public void createUser(@RequestBody UserDTO userDTO) {
+        public void createUser(@RequestBody UserRequestDTO userRequestDTO) {
+                UserRepresentation user = userRequestDTO.getUser();
+                String password = userRequestDTO.getPassword();
+
                 keycloakService.createUser(
-                                userDTO.getUsername(),
-                                userDTO.getFirstName(),
-                                userDTO.getLastName(),
-                                userDTO.getEmail(),
-                                userDTO.getPassword());
+                                user.getUsername(),
+                                user.getFirstName(),
+                                user.getLastName(),
+                                user.getEmail(),
+                                password);
         }
 
         @PostMapping("/reset-password")
@@ -44,38 +50,47 @@ public class UserController {
                         @ApiResponse(responseCode = "404", description = "User not found"),
                         @ApiResponse(responseCode = "500", description = "Internal server error")
         })
-        public void resetPassword(@RequestBody UserDTO userDTO) {
-                keycloakService.resetUserPassword(userDTO.getEmail(), userDTO.getPassword());
+        public void resetPassword(@RequestBody UserRequestDTO userRequestDTO) {
+                String email = userRequestDTO.getUser().getEmail();
+                String password = userRequestDTO.getPassword();
+
+                Optional<UserRepresentation> userOptional = keycloakService.findUserByEmail(email);
+                if (userOptional.isPresent()) {
+                        String userId = userOptional.get().getId();
+                        keycloakService.resetUserPassword(userId, password);
+                } else {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+                }
         }
 
         @DeleteMapping("/delete")
-        @Operation(summary = "Delete a user", description = "Deletes the user identified by their email address from Keycloak.", responses = {
+        @Operation(summary = "Delete a user", description = "Deletes the user identified by their userId from Keycloak.", responses = {
                         @ApiResponse(responseCode = "200", description = "User deleted successfully"),
                         @ApiResponse(responseCode = "404", description = "User not found"),
                         @ApiResponse(responseCode = "500", description = "Internal server error")
         })
-        public void deleteUser(@RequestParam String email) {
-                keycloakService.deleteUser(email);
+        public void deleteUser(@RequestParam String userId) {
+                keycloakService.deleteUser(userId);
         }
 
         @PutMapping("/disable")
-        @Operation(summary = "Disable a user", description = "Disables the user identified by their email address in Keycloak, preventing further login attempts.", responses = {
+        @Operation(summary = "Disable a user", description = "Disables the user identified by their userId in Keycloak, preventing further login attempts.", responses = {
                         @ApiResponse(responseCode = "200", description = "User disabled successfully"),
                         @ApiResponse(responseCode = "404", description = "User not found"),
                         @ApiResponse(responseCode = "500", description = "Internal server error")
         })
-        public void disableUser(@RequestParam String email) {
-                keycloakService.disableUser(email);
+        public void disableUser(@RequestParam String userId) {
+                keycloakService.disableUser(userId);
         }
 
         @PutMapping("/enable")
-        @Operation(summary = "Enable a user", description = "Enable the user identified by their email address in Keycloak, preventing further login attempts.", responses = {
+        @Operation(summary = "Enable a user", description = "Enable the user identified by their userId address in Keycloak, preventing further login attempts.", responses = {
                         @ApiResponse(responseCode = "200", description = "User Enable successfully"),
                         @ApiResponse(responseCode = "404", description = "User not found"),
                         @ApiResponse(responseCode = "500", description = "Internal server error")
         })
-        public void enableUser(@RequestParam String email) {
-                keycloakService.enableUser(email);
+        public void enableUser(@RequestParam String userId) {
+                keycloakService.enableUser(userId);
         }
 
         @GetMapping("/list")
@@ -83,7 +98,7 @@ public class UserController {
                         @ApiResponse(responseCode = "200", description = "List of users retrieved successfully"),
                         @ApiResponse(responseCode = "500", description = "Internal server error")
         })
-        public List<Map<String, Object>> listAllUsers() {
+        public List<UserRepresentation> listAllUsers() {
                 return keycloakService.listAllUsers();
         }
 
@@ -92,11 +107,11 @@ public class UserController {
                         @ApiResponse(responseCode = "200", description = "List of roles retrieved successfully"),
                         @ApiResponse(responseCode = "500", description = "Internal server error")
         })
-        public List<Map<String, Object>> listAllRoles() {
+        public List<RoleRepresentation> listAllRoles() {
                 return keycloakService.listAllRoles();
         }
 
-        @PostMapping("/users/{userId}/roles/add")
+        @PostMapping("/{userId}/roles/add")
         @Operation(summary = "Assign a role to a user", description = "Assigns a specified role to the user identified by userId in Keycloak.", responses = {
                         @ApiResponse(responseCode = "200", description = "Role assigned successfully"),
                         @ApiResponse(responseCode = "400", description = "Invalid input data"),
@@ -106,10 +121,10 @@ public class UserController {
         public void addUserRole(
                         @PathVariable String userId,
                         @RequestParam String roleName) {
-                keycloakService.addUserRole(userId, roleName);
+                keycloakService.assignRoleToUser(userId, roleName);
         }
 
-        @PostMapping("/users/{userId}/roles/remove")
+        @PostMapping("/{userId}/roles/remove")
         @Operation(summary = "Remove a role to a user", description = "Remove a specified role to the user identified by userId in Keycloak.", responses = {
                         @ApiResponse(responseCode = "200", description = "Role remove successfully"),
                         @ApiResponse(responseCode = "400", description = "Invalid input data"),

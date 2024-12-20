@@ -30,3 +30,27 @@ table {
 .actions button {
     flex-shrink: 0;
 }
+
+/* styles.css */
+
+@media (max-width: 768px) {
+    .hide-on-small {
+        display: none;
+    }
+
+    .small-cell {
+        font-size: 12px;
+        padding: 0;
+    }
+
+    .small-button {
+        height: 32px;
+        width: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hide-on-extra-small {
+        display: none;
+    }
+}
