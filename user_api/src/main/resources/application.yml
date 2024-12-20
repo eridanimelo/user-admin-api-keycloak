@@ -4,6 +4,7 @@ server:
 spring:
   profiles:
     active: local
+  
   security:
     oauth2:
       resourceserver:

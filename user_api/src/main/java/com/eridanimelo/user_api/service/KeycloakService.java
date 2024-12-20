@@ -14,7 +14,14 @@ public interface KeycloakService {
 
     void disableUser(String email);
 
+    void enableUser(String email);
+
     List<Map<String, Object>> listAllUsers();
 
     void resetUserPassword(String email, String newPassword);
+
+    void removeUserRole(String userId, String roleName);
+
+    List<Map<String, Object>> listAllRoles();
+
 }

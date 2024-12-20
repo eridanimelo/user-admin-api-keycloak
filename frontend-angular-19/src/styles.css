@@ -1,0 +1,43 @@
+/* You can add global styles to this file, and also import other style files */
+body,
+html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 250px auto;
+    height: 100vh;
+}
+
+.side-menu {
+    background-color: #1a1a1a;
+    color: white;
+    padding: 1rem;
+}
+
+.content {
+    padding: 2rem;
+}
+
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+
+    .side-menu {
+        display: none;
+    }
+
+    .side-menu.active {
+        display: block;
+        position: absolute;
+        z-index: 1000;
+        width: 250px;
+    }
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

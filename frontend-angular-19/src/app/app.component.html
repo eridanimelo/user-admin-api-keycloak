@@ -1,0 +1,49 @@
+<div class="layout">
+  <aside class="sidenav">
+    <div class="logo">Logo</div>
+    <mat-divider></mat-divider>
+    <nav>
+      <ul>
+        <li *ngFor="let item of menuItems">
+          <a [routerLink]="item.route">{{ item.name }}</a>
+
+        </li>
+      </ul>
+    </nav>
+
+    <mat-divider></mat-divider>
+
+    <!-- Botão de logout no final -->
+    <div class="logout-button">
+      <button mat-raised-button (click)="onLogout()">
+        <mat-icon>logout</mat-icon>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <mat-toolbar class="custom-toolbar">
+      <button mat-icon-button aria-label="Example icon-button with menu icon">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>My App</span>
+      <span class="app-spacer"></span>
+      <small>{{ username }}</small>
+
+      <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="logout">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="onLogout()">
+          <mat-icon>logout</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

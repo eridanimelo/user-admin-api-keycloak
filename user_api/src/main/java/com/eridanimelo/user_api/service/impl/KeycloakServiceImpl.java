@@ -7,12 +7,17 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.eridanimelo.user_api.config.exception.KeycloakServiceException;
 import com.eridanimelo.user_api.config.exception.UserNotFoundException;
 import com.eridanimelo.user_api.service.KeycloakService;
 
+import jakarta.annotation.PostConstruct;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class KeycloakServiceImpl implements KeycloakService {
@@ -28,6 +33,14 @@ public class KeycloakServiceImpl implements KeycloakService {
 
     @Value("${keycloak.client.secret}")
     private String adminClientSecret;
+
+    @PostConstruct
+    private void validateProperties() {
+        Objects.requireNonNull(keycloakServerUrl, "The property 'keycloak.server.url' must not be null");
+        Objects.requireNonNull(realm, "The property 'keycloak.realm' must not be null");
+        Objects.requireNonNull(adminClientId, "The property 'keycloak.client.id' must not be null");
+        Objects.requireNonNull(adminClientSecret, "The property 'keycloak.client.secret' must not be null");
+    }
 
     private String getAdminAccessToken() {
         String tokenUrl = String.format("%s/realms/%s/protocol/openid-connect/token", keycloakServerUrl, realm);
@@ -49,7 +62,7 @@ public class KeycloakServiceImpl implements KeycloakService {
         if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
             return response.getBody().get("access_token").toString();
         } else {
-            throw new RuntimeException("Failed to obtain access token");
+            throw new KeycloakServiceException("Failed to obtain access token");
         }
     }
 
@@ -82,7 +95,7 @@ public class KeycloakServiceImpl implements KeycloakService {
         ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
 
         if (response.getStatusCode() != HttpStatus.CREATED) {
-            throw new RuntimeException("Failed to create user: " + response.getBody());
+            throw new KeycloakServiceException("Failed to create user: " + response.getBody());
         }
     }
 
@@ -116,25 +129,23 @@ public class KeycloakServiceImpl implements KeycloakService {
 
         RestTemplate restTemplate = new RestTemplate();
 
-        // Busca informações da role
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
 
+        // Obter detalhes da role
         ResponseEntity<Map> roleResponse = restTemplate.exchange(roleUrl, HttpMethod.GET, new HttpEntity<>(headers),
                 Map.class);
-
-        if (roleResponse.getStatusCode() != HttpStatus.OK) {
-            throw new RuntimeException("Role not found: " + roleName);
+        if (roleResponse.getStatusCode() != HttpStatus.OK || roleResponse.getBody() == null) {
+            throw new KeycloakServiceException("Role not found or invalid response: " + roleName);
         }
-
         Map<String, Object> role = roleResponse.getBody();
 
-        // Adiciona a role ao usuário
+        // Adicionar role ao usuário
         HttpEntity<List<Map<String, Object>>> entity = new HttpEntity<>(Collections.singletonList(role), headers);
         ResponseEntity<Void> assignResponse = restTemplate.postForEntity(assignRoleUrl, entity, Void.class);
 
         if (!assignResponse.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("Failed to assign role to user");
+            throw new KeycloakServiceException("Failed to assign role to user: " + assignResponse.getStatusCode());
         }
     }
 
@@ -153,21 +164,16 @@ public class KeycloakServiceImpl implements KeycloakService {
                 Void.class);
 
         if (response.getStatusCode() != HttpStatus.NO_CONTENT) {
-            throw new RuntimeException("Failed to delete user with email: " + email);
+            throw new KeycloakServiceException("Failed to delete user with email: " + email);
         }
     }
 
     @Override
     public void disableUser(String email) {
-        // Reutiliza o método findUserIdByEmail para obter o userId
         String userId = findUserIdByEmail(email);
-
         String accessToken = getAdminAccessToken();
-
-        // URL para desabilitar o usuário
         String url = String.format("%s/admin/realms/%s/users/%s", keycloakServerUrl, realm, userId);
 
-        // Corpo da requisição para desabilitar o usuário
         String requestBody = "{ \"enabled\": false }";
 
         HttpHeaders headers = new HttpHeaders();
@@ -179,18 +185,39 @@ public class KeycloakServiceImpl implements KeycloakService {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
 
-        // Verifica se a resposta foi bem-sucedida
         if (response.getStatusCode() != HttpStatus.NO_CONTENT) {
-            throw new RuntimeException(
+            throw new KeycloakServiceException(
                     "Failed to disable user: " + response.getStatusCode() + " " + response.getBody());
         }
+    }
 
+    @Override
+    public void enableUser(String email) {
+        String userId = findUserIdByEmail(email);
+        String accessToken = getAdminAccessToken();
+        String url = String.format("%s/admin/realms/%s/users/%s", keycloakServerUrl, realm, userId);
+
+        String requestBody = "{ \"enabled\": true }";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + accessToken);
+
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
+
+        if (response.getStatusCode() != HttpStatus.NO_CONTENT) {
+            throw new KeycloakServiceException(
+                    "Failed to enable user: " + response.getStatusCode() + " " + response.getBody());
+        }
     }
 
     @Override
     public List<Map<String, Object>> listAllUsers() {
         String accessToken = getAdminAccessToken();
-        String url = String.format("%s/admin/realms/%s/users", keycloakServerUrl, realm);
+        String usersUrl = String.format("%s/admin/realms/%s/users", keycloakServerUrl, realm);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
@@ -198,13 +225,35 @@ public class KeycloakServiceImpl implements KeycloakService {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
+        // Buscar todos os usuários
+        ResponseEntity<List> response = restTemplate.exchange(usersUrl, HttpMethod.GET, entity, List.class);
 
         if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            return response.getBody();
+            List<Map<String, Object>> usersWithRoles = new ArrayList<>();
+            List<Map<String, Object>> users = response.getBody();
+
+            for (Map<String, Object> user : users) {
+                String userId = (String) user.get("id");
+                String rolesUrl = String.format("%s/admin/realms/%s/users/%s/role-mappings/realm", keycloakServerUrl,
+                        realm, userId);
+
+                // Buscar roles para cada usuário
+                ResponseEntity<List> rolesResponse = restTemplate.exchange(rolesUrl, HttpMethod.GET, entity,
+                        List.class);
+                List<Map<String, Object>> roles = rolesResponse.getStatusCode() == HttpStatus.OK
+                        && rolesResponse.getBody() != null
+                                ? rolesResponse.getBody()
+                                : new ArrayList<>();
+
+                // Adicionar os detalhes das roles ao usuário
+                user.put("roles", roles);
+                usersWithRoles.add(user);
+            }
+
+            return usersWithRoles;
         }
 
-        throw new RuntimeException("Failed to fetch users");
+        throw new KeycloakServiceException("Failed to fetch users with roles");
     }
 
     @Override
@@ -229,7 +278,69 @@ public class KeycloakServiceImpl implements KeycloakService {
         ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
 
         if (response.getStatusCode() != HttpStatus.NO_CONTENT) {
-            throw new RuntimeException("Failed to reset password for user: " + email);
+            throw new KeycloakServiceException("Failed to reset password for user: " + email);
+        }
+    }
+
+    @Override
+    public void removeUserRole(String userId, String roleName) {
+        String accessToken = getAdminAccessToken();
+        String roleUrl = String.format("%s/admin/realms/%s/roles/%s", keycloakServerUrl, realm, roleName);
+        String removeRoleUrl = String.format("%s/admin/realms/%s/users/%s/role-mappings/realm", keycloakServerUrl,
+                realm, userId);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+
+        ResponseEntity<Map> roleResponse = restTemplate.exchange(roleUrl, HttpMethod.GET, new HttpEntity<>(headers),
+                Map.class);
+
+        if (roleResponse.getStatusCode() != HttpStatus.OK) {
+            throw new KeycloakServiceException("Role not found: " + roleName);
+        }
+
+        ResponseEntity<Map> userResponse = restTemplate.exchange(
+                String.format("%s/admin/realms/%s/users/%s", keycloakServerUrl, realm, userId),
+                HttpMethod.GET, new HttpEntity<>(headers), Map.class);
+
+        if (userResponse.getStatusCode() != HttpStatus.OK) {
+            throw new KeycloakServiceException("User not found with ID: " + userId);
+        }
+
+        Map<String, Object> role = roleResponse.getBody();
+
+        HttpEntity<List<Map<String, Object>>> entity = new HttpEntity<>(Collections.singletonList(role), headers);
+        ResponseEntity<Void> removeResponse = restTemplate.exchange(removeRoleUrl, HttpMethod.DELETE, entity,
+                Void.class);
+
+        if (!removeResponse.getStatusCode().is2xxSuccessful()) {
+            throw new KeycloakServiceException("Failed to remove role from user");
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> listAllRoles() {
+        String accessToken = getAdminAccessToken();
+        String url = String.format("%s/admin/realms/%s/roles", keycloakServerUrl, realm);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
+
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                return response.getBody();
+            } else {
+                throw new KeycloakServiceException("Unexpected response status: " + response.getStatusCode());
+            }
+        } catch (Exception e) {
+            throw new KeycloakServiceException("Failed to fetch roles: " + e.getMessage(), e);
         }
     }
 }

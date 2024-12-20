@@ -1,0 +1,8 @@
+h1 {
+    color: var(--primary-color);
+}
+
+p {
+    font-size: 1.2em;
+    color: var(--text-color);
+}
