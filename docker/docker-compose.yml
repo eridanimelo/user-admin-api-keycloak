@@ -11,7 +11,7 @@ services:
       - KEYCLOAK_DB_URL=jdbc:postgresql://db:5432/keycloak
       - KEYCLOAK_DB_USERNAME=keycloak
       - KEYCLOAK_DB_PASSWORD=keycloak_password
-      - KEYCLOAK_THEME=my-custom-theme
+      - KC_THEME=mytheme
       - MAILHOG_SMTP_HOST=mailhog:1025
       - MAILHOG_HTTP_HOST=mailhog:8025
     command: start-dev
@@ -22,6 +22,7 @@ services:
       - mailhog
     volumes:
       - ./keycloak_data:/opt/keycloak/data
+      - ./keycloak-theme/themes:/opt/keycloak/themes
 
   db:
     container_name: keycloak-db
