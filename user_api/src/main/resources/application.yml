@@ -1,0 +1,50 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: local
+  
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/user-api
+      client:
+        registration:
+          keycloak:
+            client-id: userapi
+            client-secret:
+            authorization-grant-type: public
+            scope: openid, profile, email
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8081/realms/user-api
+  mail:
+    host: localhost
+    port: 1025
+    username: ""
+    password: ""
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls: 
+            enable: false
+keycloak:
+  server:
+    url: http://localhost:8081
+  realm: user-api 
+  client:
+    id: admin-cli # Client ID Keycloak
+    secret: ZQEAl5LvOO7HbTx1qF4zAMkWuDBn0XLm
+  admin-username: admin
+  admin-password: admin
+
+logging:
+  level:
+    root: INFO
+    org.springframework: DEBUG
+    com.eridanimelo: DEBUG
+
+

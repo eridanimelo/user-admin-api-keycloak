@@ -1,0 +1,56 @@
+.full-width {
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+mat-toolbar {
+    margin-bottom: 20px;
+}
+
+mat-card {
+    margin-bottom: 20px;
+    padding: 16px;
+}
+
+table {
+    width: 100%;
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.actions h2 {
+    margin: 0;
+}
+
+.actions button {
+    flex-shrink: 0;
+}
+
+/* styles.css */
+
+@media (max-width: 768px) {
+    .hide-on-small {
+        display: none;
+    }
+
+    .small-cell {
+        font-size: 12px;
+        padding: 0;
+    }
+
+    .small-button {
+        height: 32px;
+        width: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hide-on-extra-small {
+        display: none;
+    }
+}

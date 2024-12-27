@@ -1,0 +1,66 @@
+.layout {
+
+    width: auto;
+    height: 100vh;
+}
+
+.app-spacer {
+    flex: 1 1 auto;
+}
+
+.sidenav {
+    width: 250px;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidenav .logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.sidenav nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidenav nav ul li {
+    margin: 15px 0;
+}
+
+.sidenav nav ul li a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-size: 1.1em;
+    transition: color 0.3s ease;
+}
+
+.sidenav nav ul li a:hover {
+    color: #cce7ff;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.custom-toolbar {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.content {
+    flex: 1;
+    padding: 20px;
+    background-color: var(--background-color);
+    overflow-y: auto;
+}
+
+.logout-button {
+    margin: 16px;
+    text-align: center;
+}

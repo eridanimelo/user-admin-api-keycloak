@@ -1,0 +1,6 @@
+/* keycloak-themes/my-custom-theme/login/resources/css/login.css */
+body {
+    background-image: url('resources/img/img.jpeg');
+    background-size: cover;
+    color: #fff;
+}

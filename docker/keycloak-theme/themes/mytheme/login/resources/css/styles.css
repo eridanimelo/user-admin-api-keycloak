@@ -1,0 +1,165 @@
+:root {
+    --primary-color: #6200ea;
+    /* Cor primária moderna */
+    --secondary-color: #03dac6;
+    /* Cor secundária */
+    --background-color: #f4f5f7;
+    /* Fundo geral */
+    --input-border-color: #d6d9dd;
+    /* Borda do input */
+    --button-hover-color: #3700b3;
+    /* Cor de hover no botão */
+}
+
+/* Fundo geral */
+.login-pf body {
+    background: linear-gradient(135deg, #6200ea 0%, #03dac6 100%);
+    background-size: cover;
+
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Cartão de login */
+.card-pf {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+    max-width: 400px;
+    margin: auto;
+}
+
+
+
+/* Campo de input */
+.login-pf input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid var(--input-border-color);
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #333333;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    outline: none;
+}
+
+.login-pf input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 6px var(--primary-color);
+}
+
+/* Campo de senha com botão "olho" */
+.pf-c-input-group {
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--input-border-color);
+    border-radius: 8px;
+    background-color: #ffffff;
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pf-c-input-group:hover,
+.pf-c-input-group:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 6px var(--primary-color);
+}
+
+.pf-c-input-group input {
+    border: none;
+    flex: 1;
+    padding: 12px;
+    font-size: 16px;
+    outline: none;
+}
+
+.pf-c-input-group button {
+    background: none;
+    border: none;
+    padding: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--input-border-color);
+    transition: color 0.3s ease;
+}
+
+.pf-c-input-group button:hover {
+    color: var(--primary-color);
+}
+
+/* Checkbox (Remember Me) */
+.checkbox {
+    display: flex;
+    align-items: center;
+
+}
+
+.checkbox input[type="checkbox"] {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--input-border-color);
+    border-radius: 4px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.checkbox input[type="checkbox"]:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M20.285 2.547L7.072 15.759 3.713 12.4a1 1 0 10-1.414 1.414l4.072 4.071a1 1 0 001.414 0l13.213-13.213a1 1 0 00-1.414-1.414z"></path></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.checkbox label {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.checkbox label:hover {
+    color: var(--primary-color);
+}
+
+/* Botão */
+
+
+.login-pf button:hover {
+    background-color: var(--button-hover-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Link (Forgot password?) */
+.login-pf a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.login-pf a:hover {
+    color: var(--secondary-color);
+}
+
+/* Botão de mostrar/esconder senha */
+.pf-c-button.pf-m-control {
+    padding: 0 16px;
+}
+
+.checkbox input[type=checkbox],
+.checkbox-inline input[type=checkbox],
+.radio input[type=radio],
+.radio-inline input[type=radio] {
+    position: relative;
+    margin-left: -28px;
+}
+
+.fa {
+    padding: 9px;
+}

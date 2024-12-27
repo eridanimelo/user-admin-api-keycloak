@@ -1,0 +1,22 @@
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Define duas colunas iguais */
+    gap: 16px;
+    /* Espaçamento entre os elementos */
+}
+
+.grid-item {
+    width: 100%;
+    /* Garante que os campos ocupem o espaço da coluna */
+}
+
+.button-container {
+    grid-column: span 2;
+    /* Os botões ocupam as duas colunas */
+    display: flex;
+    justify-content: flex-end;
+    /* Alinha os botões à direita */
+    gap: 8px;
+    /* Espaçamento entre os botões */
+}

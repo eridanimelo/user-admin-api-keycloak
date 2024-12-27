@@ -1,0 +1,79 @@
+<div class="user-management">
+
+    <div class="actions">
+        <h2>User List</h2>
+        <button mat-raised-button color="primary" (click)="openAddUserDialog()">
+            Add User
+        </button>
+    </div>
+    @if(users.length){
+    <mat-card>
+        <table mat-table [dataSource]="users" class="mat-elevation-z8">
+            <ng-container matColumnDef="username">
+                <th mat-header-cell *matHeaderCellDef class="hide-on-small"> Username </th>
+                <td mat-cell *matCellDef="let user" class="hide-on-small small-cell"> {{ user.username }} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef class="hide-on-extra-small"> Email </th>
+                <td mat-cell *matCellDef="let user" class="hide-on-extra-small small-cell"> {{ user.email }} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="roles">
+                <th mat-header-cell *matHeaderCellDef> Roles </th>
+                <td mat-cell *matCellDef="let user" class="small-cell">
+                    <div *ngFor="let role of user.attributes.roles" style="width: 100%;">
+                        <!-- Verifica se a role não é a 'default-roles-user-api' -->
+                        <span *ngIf="role !== 'default-roles-user-api'">{{ role }}</span>
+                        <!-- Botão para remover role, caso não seja a 'default-roles-user-api' -->
+                        <button mat-icon-button color="warn" class="small-button"
+                            *ngIf="role !== 'default-roles-user-api'" (click)="removeRole(user, role)">
+                            <mat-icon>remove</mat-icon>
+                        </button>
+                    </div>
+                    <!-- Botão para adicionar role -->
+                    <button mat-icon-button color="primary" class="small-button" (click)="openAssignRoleDialog(user)">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="emailVerified">
+                <th mat-header-cell *matHeaderCellDef class="hide-on-extra-small"> Email Verified </th>
+                <td mat-cell *matCellDef="let user" class="hide-on-extra-small small-cell">
+                    {{ user.emailVerified }}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="enabled">
+                <th mat-header-cell *matHeaderCellDef> Enabled </th>
+                <td mat-cell *matCellDef="let user" class="small-cell">
+                    <mat-slide-toggle [(ngModel)]="user.enabled"
+                        (change)="onToggleChangeDisable(user)"></mat-slide-toggle>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef> Actions </th>
+                <td mat-cell *matCellDef="let user" class="small-cell">
+                    <button mat-icon-button color="accent" class="small-button" (click)="resetPassword(user)">
+                        <mat-icon>vpn_key</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" class="small-button" (click)="deleteUser(user)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['username', 'email', 'emailVerified', 'roles', 'enabled', 'actions']">
+            </tr>
+            <tr mat-row
+                *matRowDef="let row; columns: ['username', 'email', 'emailVerified', 'roles', 'enabled', 'actions']">
+            </tr>
+        </table>
+
+    </mat-card>
+    }
+
+</div>

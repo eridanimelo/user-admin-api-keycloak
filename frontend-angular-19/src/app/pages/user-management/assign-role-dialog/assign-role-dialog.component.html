@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>Assign Role</h2>
+<mat-dialog-content>
+    <mat-form-field appearance="outline" style="width: 100%;">
+        <mat-label>Select Role</mat-label>
+        <mat-select [(ngModel)]="selectedRole">
+            <mat-option *ngFor="let role of availableRoles" [value]="role">{{ role }}</mat-option>
+        </mat-select>
+    </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button color="primary" (click)="assignRole()">Assign</button>
+    <button mat-button mat-dialog-close>Cancel</button>
+</mat-dialog-actions>
